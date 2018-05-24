@@ -1,0 +1,2 @@
+﻿  AnimationView.cpp
+f:\guyi_code\animation\animation\animationview.cpp(74): error C3867: “CBitmap::GetBitmap”: 非标准语法；请使用 "&" 来创建指向成员的指针
