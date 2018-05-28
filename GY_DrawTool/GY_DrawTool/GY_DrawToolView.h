@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include"Arbitrary_Painting.h"
 #include "Point2D.h"
 #include"Line.h"
 class CGY_DrawToolView : public CView
@@ -61,6 +62,10 @@ public:
 	afx_msg void OnLine();
 //	afx_msg void OnUpdatePoint2d(CCmdUI *pCmdUI);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnArbitraryPainting();
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	bool m_Move;
 };
 
 #ifndef _DEBUG  // GY_DrawToolView.cpp 中的调试版本

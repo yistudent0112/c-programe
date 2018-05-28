@@ -37,6 +37,9 @@ BEGIN_MESSAGE_MAP(CGY_DrawToolView, CView)
 	ON_COMMAND(ID_Line, &CGY_DrawToolView::OnLine)
 	//ON_UPDATE_COMMAND_UI(ID_Point2D, &CGY_DrawToolView::OnUpdatePoint2d)
 	ON_WM_LBUTTONDOWN()
+	ON_COMMAND(ID_Arbitrary_painting, &CGY_DrawToolView::OnArbitraryPainting)
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // CGY_DrawToolView 构造/析构
@@ -46,6 +49,7 @@ CGY_DrawToolView::CGY_DrawToolView()
 	// TODO: 在此处添加构造代码
 	m_nEleKind = -1;
 	m_nMouseDown = 0;
+	m_Move = false;
 }
 
 void CGY_DrawToolView::SerializeEx(CArchive & ar)
@@ -198,6 +202,7 @@ void CGY_DrawToolView::OnRedo()
 void CGY_DrawToolView::OnOpenex()
 {
 	// TODO: 在此添加命令处理程序代码
+	/*
 	CFile file;
 	if (file.Open((LPCTSTR)"f:\\1.dat", CFile::modeRead) == TRUE)
 	{
@@ -206,6 +211,47 @@ void CGY_DrawToolView::OnOpenex()
 		ar.Close();
 		file.Close();
 	}
+	*/
+	// TODO: 在此添加命令处理程序代码  
+	char szFilters[] =
+		"Dat File(*.dat)\0*.dat\0"\
+		"Text File(*.txt)\0*.txt\0"\
+		"All Typle(*.*)\0*.*\0" \
+		"\0";
+
+	CFileDialog OpenDlg(TRUE);
+	OpenDlg.m_ofn.lpstrTitle = _T ("Open File");
+	OpenDlg.m_ofn.lpstrFilter = _T(szFilters);
+
+	if (IDOK == OpenDlg.DoModal())
+	{
+		CFile File;
+		CFileException e;
+		//构造文件，同时增加异常处理  
+		if (!File.Open(OpenDlg.GetPathName(), CFile::modeRead, &e))
+		{
+			CString strErr;
+			strErr.Format(_T("File could not be opened %d\n"), e.m_cause);
+			MessageBox(strErr);
+		}
+		//创建指定大小的Buffer  
+		DWORD  dwFileLenth = (DWORD)File.GetLength();
+		//初始化buffer， 增加一个/0空间  
+		char *pBuf = new char[dwFileLenth + 1];
+		memset(pBuf, 0, dwFileLenth + 1);
+
+		if (pBuf != NULL)
+		{
+			//读取文件内容  
+			File.Read(pBuf, dwFileLenth);
+			File.Close();
+			//显示文件内容  
+			MessageBox(_T(pBuf));
+			//删除bufer，避免内存泄漏  
+			delete[] pBuf;
+			pBuf = NULL;
+		}
+	}
 	this->Invalidate();
 }
 
@@ -213,6 +259,7 @@ void CGY_DrawToolView::OnOpenex()
 void CGY_DrawToolView::OnSaveex()
 {
 	// TODO: 在此添加命令处理程序代码
+	/*
 	CFile file;
 	if (file.Open((LPCTSTR)"f:\\1.dat", CFile::modeWrite | CFile::modeCreate) == TRUE)
 	{
@@ -220,6 +267,38 @@ void CGY_DrawToolView::OnSaveex()
 		SerializeEx(ar);
 		ar.Close();
 		file.Close();
+	}
+	*/
+	//格式：过滤器描述符（显示作用）+ \0 + 文件扩展名称（过滤作用）  
+	//多个扩展名称之间用（;）分隔，两个过滤字符串之间以\0分隔  
+	//最后的过滤器需要以两个\0\0结尾  
+	char szFilters[] =
+		"Dat File(*.dat)\0*.dat\0" \
+		"Text File(*.txt)\0*.txt\0" \
+		"All Typle(*.*)\0*.*\0" \
+		"\0";
+	//当过滤器或者默认构造参数赋值较少情况下，  
+	//使用构造函数修改对话框初始状态可能更好，这过滤器较多  
+	CFileDialog FileDlg(FALSE, _T("dat"), _T("Test"));
+	FileDlg.m_ofn.lpstrTitle = _T("Save File");
+	FileDlg.m_ofn.lpstrFilter = _T(szFilters);
+
+	//通过以下两个参数修改对话框初始状态，程序奔溃，使用默认构造形式正常  
+	//环境：VS2008编译器+Wind7系统  
+	//FileDlg.m_ofn.lpstrDefExt = "txt";  
+	//FileDlg.m_ofn.lpstrFile = "test";  
+
+	if (IDOK == FileDlg.DoModal())
+	{
+		CFile File(FileDlg.GetPathName(), CFile::modeCreate | CFile::modeReadWrite);
+
+		char szBufData[100] = { "恭喜你成功打开" };
+		//写入文件内容,不包含/0  
+		File.Write(szBufData, strlen(szBufData));
+		//立即写入，不缓冲  
+		File.Flush();
+		//文件操作结束关闭  
+		File.Close();
 	}
 }
 
@@ -279,5 +358,76 @@ void CGY_DrawToolView::OnLButtonDown(UINT nFlags, CPoint point)
 			m_nMouseDown = 0;
 		}
 	}
+	if (m_nEleKind = 2) {
+		m_Move = true;
+		m_pt0 = CPoint2D(point.x, point.y);
+		/*
+		m_nMouseDown++;
+		if (m_nMouseDown == 1) {
+			m_pt0 = CPoint2D(point.x, point.y);
+			CDC *pDC = this->GetDC();
+			m_pt0.Draw(pDC);
+			this->ReleaseDC(pDC);
+		}
+		else {
+			m_pt1 = CPoint2D(point.x, point.y);
+			CArbitrary_Painting *Arbitrary = new CArbitrary_Painting(m_pt0, m_pt1);
+			CDC *pDC = this->GetDC();
+			m_pt1.Draw(pDC);
+			Arbitrary->Draw(pDC);
+			this->ReleaseDC(pDC);
+			m_listOfEle.AddTail(Arbitrary);
+			m_nMouseDown = 0;
+		}*/
+	}
 	CView::OnLButtonDown(nFlags, point);
+}
+
+
+void CGY_DrawToolView::OnArbitraryPainting()
+{
+	m_nEleKind = 2;
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CGY_DrawToolView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	m_Move = false;
+	CView::OnLButtonUp(nFlags, point);
+}
+
+
+void CGY_DrawToolView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	if (m_Move) {
+		if (m_nEleKind == 2) {
+			m_nMouseDown++;
+			if (m_nMouseDown %2== 1) {
+				m_pt0 = CPoint2D(point.x, point.y);
+				CDC *pDC = this->GetDC();
+				m_pt0.Draw(pDC);
+				this->ReleaseDC(pDC);
+			}
+			else {
+				m_pt1 = CPoint2D(point.x, point.y);
+				CArbitrary_Painting *Arbitrary = new CArbitrary_Painting(m_pt0, m_pt1);
+				CDC *pDC = this->GetDC();
+				m_pt1.Draw(pDC);
+				Arbitrary->Draw(pDC);
+				m_pt0 = CPoint2D(point.x, point.y);
+				//Arbitrary->UpdatePoint(m_pt0);
+				this->ReleaseDC(pDC);
+				m_listOfEle.AddTail(Arbitrary);
+				//m_nMouseDown = 0;
+				m_nMouseDown++;
+			}
+		}
+		else {
+			return;
+		}
+	}
+	CView::OnMouseMove(nFlags, point);
 }

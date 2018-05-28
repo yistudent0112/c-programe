@@ -14,6 +14,7 @@ public:
 	virtual void Serialize(CArchive &ar);
 
 	virtual void Draw(CDC *pDC);
+	void UpdatePoint(CPoint2D point);
 	CPoint2D m_pt0;
 	CPoint2D m_pt1;
 };

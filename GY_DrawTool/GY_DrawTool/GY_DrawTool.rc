@@ -211,7 +211,7 @@ BEGIN
         MENUITEM "打印预览(&V)",                    ID_FILE_PRINT_PREVIEW
         MENUITEM "打印设置(&R)...",                 ID_FILE_PRINT_SETUP
         MENUITEM SEPARATOR
-        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1
         MENUITEM SEPARATOR
         MENUITEM "退出(&X)",                      ID_APP_EXIT
     END
@@ -255,7 +255,7 @@ BEGIN
     BEGIN
         MENUITEM "点",                           ID_Point2D
         MENUITEM "线",                           ID_Line
-        MENUITEM "任意画",                         ID_Arbitrary_painting
+        MENUITEM "一笔画",                         ID_Arbitrary_painting
     END
     POPUP "编辑扩展"
     BEGIN
