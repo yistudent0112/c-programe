@@ -1,13 +1,3 @@
-﻿  stdafx.cpp
-  ViewTree.cpp
-  PropertiesWnd.cpp
-  OutputWnd.cpp
-  MainFrm.cpp
-  GY_PersonMoveView.cpp
-  GY_PersonMoveDoc.cpp
-  GY_PersonMove.cpp
-  FileView.cpp
-  ClassView.cpp
-  正在生成代码...
+﻿  GY_PersonMoveView.cpp
   GY_PersonMove.vcxproj -> F:\guyi_code\GY_PersonMove\Debug\GY_PersonMove.exe
   GY_PersonMove.vcxproj -> F:\guyi_code\GY_PersonMove\Debug\GY_PersonMove.pdb (Partial PDB)

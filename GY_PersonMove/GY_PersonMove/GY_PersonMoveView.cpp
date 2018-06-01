@@ -78,13 +78,23 @@ void CGY_PersonMoveView::OnDraw(CDC* pDC)
 	dc.CreateCompatibleDC(pDC);
 	dc.SelectObject(&btBackground);
  
- 
+	if (m_Cpoint.x > m_client.Width())
+	{
+		m_Cpoint.x = 0;
+    }
+	if (m_Cpoint.y > m_client.Height())
+	{
+		m_Cpoint.y = 0;
+	}
+
+
+
 	
 	pDC->BitBlt(0, 0, m_client.Width(),m_client.Height(), &dc, 0, 0, SRCCOPY);
 	dc.SelectObject(&btPeople);
-	//pDC->BitBlt(m_Cpoint.x, m_Cpoint.y, bm2.bmWidth, bm2.bmHeight, &dc, 0, 0, SRCCOPY);
+	pDC->BitBlt(m_Cpoint.x, m_Cpoint.y, bm2.bmWidth, bm2.bmHeight, &dc, 0, 0, SRCAND);
 	dc.SelectObject(&btPeople1);
-	pDC->BitBlt(m_Cpoint.x, m_Cpoint.y, bm2.bmWidth, bm2.bmHeight, &dc, 0, 0, SRCCOPY);
+	pDC->BitBlt(m_Cpoint.x, m_Cpoint.y, bm2.bmWidth, bm2.bmHeight, &dc, 0, 0, SRCPAINT);
 	ReleaseDC(cDC);           //释放DC 
 	if (!pDoc)
 		return;
@@ -177,6 +187,14 @@ void CGY_PersonMoveView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	default:
 		break;
 	}
+	if (m_Cpoint.x > m_client.Width())
+	{
+		m_Cpoint.x = 0;
+	}
+	if (m_Cpoint.y > m_client.Height())
+	{
+		m_Cpoint.y = 0;
+	}
 	Invalidate(NULL);
 	CView::OnKeyDown(nChar, nRepCnt, nFlags);
 }
@@ -187,6 +205,14 @@ void CGY_PersonMoveView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	m_Cpoint.x = point.x;
 	m_Cpoint.y = point.y;
+	if (m_Cpoint.x > m_client.Width())
+	{
+		m_Cpoint.x = 0;
+	}
+	if (m_Cpoint.y > m_client.Height())
+	{
+		m_Cpoint.y = 0;
+	}
 	Invalidate(NULL);
 	CView::OnLButtonDblClk(nFlags, point);
 }
